@@ -28,7 +28,8 @@ from .collector import Collector
 from .db import Database
 from .logsetup import get_logger, setup_logging
 from .model import ModelRegistry
-from .settings import (AppConfig, LOGS_DIR, REPO_DIR, ensure_dirs, load_llm_env)
+from .settings import (AppConfig, LOGS_DIR, REPO_DIR, ensure_dirs,
+                       llm_config_status, load_llm_env)
 from .trainer import Trainer
 from .verifier import Verifier
 
@@ -173,6 +174,13 @@ class Orchestrator:
         interval = max(60, int(self.cfg.collector.interval_s))
         log.info("автопилот запущен: интервал %d с, источников %d, модель %s",
                  interval, len(self.collector.sources), self.registry.version)
+        llm = llm_config_status()
+        if not llm["has_key"]:
+            log.warning("ключ модели не найден (%s): работают только "
+                        "детерминированные проверки, меток будет мало",
+                        llm["env_file"])
+        else:
+            log.info("модель: %s @ %s", llm["model"], llm["base_url"])
         log.info("остановка: Ctrl+C")
         while not self._stop.is_set():
             try:

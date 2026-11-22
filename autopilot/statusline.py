@@ -16,7 +16,7 @@ from typing import Any
 
 from .db import Database
 from .model import ModelRegistry
-from .settings import AppConfig
+from .settings import AppConfig, llm_config_status
 
 BAR = "─" * 64
 RESET = "\x1b[0m"
@@ -102,6 +102,7 @@ def build_report(db: Database, registry: ModelRegistry,
         "llm_budget": cfg.verifier.llm_hourly_budget,
         "llm_calls_today": stats.get("llm_calls_today", 0),
         "llm_daily_budget": cfg.verifier.llm_daily_budget,
+        "llm_config": llm_config_status(),
         "model": model,
         "sources": sources,
         "by_source": stats.get("by_source", []),
@@ -145,6 +146,14 @@ def render(report: dict[str, Any], color: bool | None = None) -> str:
     out.append(f"  Последнее обучение: {m['last_training_at']} — {m['last_decision']}")
     if m.get("last_notes"):
         out.append(f"    {c(m['last_notes'][:110], DIM)}")
+    cfg_llm = report.get("llm_config") or {}
+    if cfg_llm.get("has_key"):
+        out.append(f"  Ключ модели:        {cfg_llm.get('model') or '—'} "
+                   f"@ {cfg_llm.get('base_url') or '—'}")
+    else:
+        out.append(f"  {c('Ключ модели:       НЕ НАСТРОЕН', YELLOW)} — "
+                   f"проверка только по базе знаний")
+        out.append(f"    {c('ожидается файл ' + str(cfg_llm.get('env_file')), DIM)}")
     out.append(f"  Вызовов модели за час:  {report['llm_calls_last_hour']} "
                f"из {report['llm_budget']}")
     daily = report.get("llm_daily_budget") or 0

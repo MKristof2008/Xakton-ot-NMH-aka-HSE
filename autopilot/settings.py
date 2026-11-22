@@ -63,10 +63,26 @@ def load_env_file(path: Path) -> int:
     return loaded
 
 
-def load_llm_env() -> None:
-    """Ключ модели: `ml/.env`, затем `.env` проекта."""
-    load_env_file(ML_DIR / ".env")
-    load_env_file(PROJECT_DIR / ".env")
+def load_llm_env() -> int:
+    """Ключ модели: `ml/.env`, затем `.env` проекта.
+
+    Возвращает число загруженных ключей — удобно для диагностики
+    «подхватился ли .env».
+    """
+    loaded = load_env_file(ML_DIR / ".env")
+    loaded += load_env_file(PROJECT_DIR / ".env")
+    return loaded
+
+
+def llm_config_status() -> dict[str, object]:
+    """Что известно про ключ модели — для статуса и диагностики."""
+    return {
+        "env_file": str(ML_DIR / ".env"),
+        "env_exists": (ML_DIR / ".env").exists(),
+        "has_key": bool(os.environ.get("LLM_API_KEY")),
+        "base_url": os.environ.get("LLM_BASE_URL", ""),
+        "model": os.environ.get("LLM_MODEL", ""),
+    }
 
 
 # ---------------------------------------------------------------------------
