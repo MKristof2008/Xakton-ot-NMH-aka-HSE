@@ -20,8 +20,9 @@
   "verifier": {
     "enabled": true,
     "llm_enabled": true,
-    "llm_hourly_budget": 200,
-    "verify_per_cycle": 20,
+    "llm_hourly_budget": 40,
+    "llm_daily_budget": 600,
+    "verify_per_cycle": 12,
     "_пороги_разметки": "ниже min_label_confidence метка не попадает в обучение",
     "min_label_confidence": 0.6,
     "min_sources_for_real": 2,

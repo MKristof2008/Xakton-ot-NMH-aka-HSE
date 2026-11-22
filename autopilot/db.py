@@ -400,6 +400,12 @@ class Database:
         return int(self.scalar("SELECT COUNT(*) FROM llm_calls WHERE ts > ?",
                                (time.time() - 3600,)))
 
+    def llm_calls_today(self) -> int:
+        """Вызовы с начала текущих суток (локальное время)."""
+        midnight = time.mktime(time.localtime()[:3] + (0, 0, 0, 0, 0, -1))
+        return int(self.scalar("SELECT COUNT(*) FROM llm_calls WHERE ts >= ?",
+                               (midnight,)))
+
     # -- арбитраж --------------------------------------------------------
     def save_arbitration(self, item_id: int, verdict: str, confidence: float,
                          rationale: str, cited: list[str], ok: bool) -> None:
@@ -489,6 +495,7 @@ class Database:
             "archived_uncertain": int(self.scalar(
                 "SELECT COUNT(*) FROM items WHERE status='archived_uncertain'")),
             "llm_calls_last_hour": self.llm_calls_last_hour(),
+            "llm_calls_today": self.llm_calls_today(),
             "active_model": dict(active) if active else None,
             "last_training": dict(last) if last else None,
         }

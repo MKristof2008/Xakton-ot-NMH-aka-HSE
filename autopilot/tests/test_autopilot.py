@@ -644,3 +644,69 @@ def test_training_data_missing_files_is_safe(tmp_path):
     assert training_data.eval_examples(tmp_path / "nope.json") == []
     assert training_data.kb_examples(tmp_path / "nope.json") == []
     assert training_data.feedback_examples(tmp_path / "nope.db") == []
+
+
+# ---------------------------------------------------------------------------
+# Бюджет модели
+# ---------------------------------------------------------------------------
+
+def test_daily_budget_caps_calls(tmp_path):
+    from autopilot.settings import VerifierConfig
+    from autopilot.verifier import Verifier
+
+    db = Database(tmp_path / "t.db")
+    registry = ModelRegistry(db, models_dir=tmp_path / "models",
+                             pointer=tmp_path / "models" / "active.json")
+    cfg = VerifierConfig(llm_hourly_budget=1000, llm_daily_budget=5,
+                         min_calls_per_item=1)
+    verifier = Verifier(db, cfg, registry)
+
+    assert verifier.budget_left() == 5
+    for _ in range(5):
+        db.log_llm_call(None, "arbiter", True, 10)
+    assert verifier.budget_left() == 0
+    assert "дневной лимит" in verifier.budget_reason()
+
+
+def test_hourly_budget_caps_calls(tmp_path):
+    from autopilot.settings import VerifierConfig
+    from autopilot.verifier import Verifier
+
+    db = Database(tmp_path / "t.db")
+    registry = ModelRegistry(db, models_dir=tmp_path / "models",
+                             pointer=tmp_path / "models" / "active.json")
+    cfg = VerifierConfig(llm_hourly_budget=3, llm_daily_budget=0)
+    verifier = Verifier(db, cfg, registry)
+
+    for _ in range(3):
+        db.log_llm_call(None, "extract", True, 10)
+    assert verifier.budget_left() == 0
+    assert "часовой лимит" in verifier.budget_reason()
+
+
+def test_zero_daily_budget_means_no_cap(tmp_path):
+    from autopilot.settings import VerifierConfig
+    from autopilot.verifier import Verifier
+
+    db = Database(tmp_path / "t.db")
+    registry = ModelRegistry(db, models_dir=tmp_path / "models",
+                             pointer=tmp_path / "models" / "active.json")
+    cfg = VerifierConfig(llm_hourly_budget=7, llm_daily_budget=0)
+    verifier = Verifier(db, cfg, registry)
+    assert verifier.budget_left() == 7
+
+
+def test_status_shows_daily_budget(tmp_path):
+    from autopilot.settings import AppConfig, TrainerConfig, VerifierConfig
+    from autopilot.statusline import build_report, render
+
+    db = Database(tmp_path / "t.db")
+    registry = ModelRegistry(db, models_dir=tmp_path / "models",
+                             pointer=tmp_path / "models" / "active.json")
+    registry.load()
+    cfg = AppConfig(verifier=VerifierConfig(llm_hourly_budget=40, llm_daily_budget=600),
+                    trainer=TrainerConfig(), sources=[])
+    report = build_report(db, registry, cfg)
+    assert report["llm_daily_budget"] == 600
+    text = render(report, color=False)
+    assert "за сутки" in text and "600" in text

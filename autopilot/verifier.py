@@ -135,7 +135,19 @@ class Verifier:
         return self._llm
 
     def budget_left(self) -> int:
-        return max(0, self.cfg.llm_hourly_budget - self.db.llm_calls_last_hour())
+        """Сколько вызовов ещё можно сделать: минимум из часового и дневного лимита."""
+        left = max(0, self.cfg.llm_hourly_budget - self.db.llm_calls_last_hour())
+        if self.cfg.llm_daily_budget > 0:
+            left = min(left, max(0, self.cfg.llm_daily_budget - self.db.llm_calls_today()))
+        return left
+
+    def budget_reason(self) -> str:
+        """Почему проверка остановилась — для лога."""
+        if self.db.llm_calls_last_hour() >= self.cfg.llm_hourly_budget:
+            return (f"часовой лимит {self.cfg.llm_hourly_budget} вызовов исчерпан")
+        if self.cfg.llm_daily_budget > 0 and                 self.db.llm_calls_today() >= self.cfg.llm_daily_budget:
+            return (f"дневной лимит {self.cfg.llm_daily_budget} вызовов исчерпан")
+        return "модель недоступна"
 
     async def _ask_arbiter(self, item, evidence: Sequence[Evidence]) -> dict | None:
         client = self._client()
@@ -493,9 +505,8 @@ class Verifier:
                     self._client() is None
                     or self.budget_left() < self.cfg.min_calls_per_item):
                 counters["budget_stop"] += 1
-                log.info("бюджет модели исчерпан (%d/час): проверка остановлена, "
-                         "материалы остаются в очереди",
-                         self.cfg.llm_hourly_budget)
+                log.info("проверка остановлена: %s. Материалы остаются в очереди "
+                         "и будут проверены позже", self.budget_reason())
                 break
             item = dict(row)
             fake_prob = item.get("fake_prob")

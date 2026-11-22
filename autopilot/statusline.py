@@ -100,6 +100,8 @@ def build_report(db: Database, registry: ModelRegistry,
         "labels_share": _pct(labeled, total),
         "llm_calls_last_hour": stats.get("llm_calls_last_hour", 0),
         "llm_budget": cfg.verifier.llm_hourly_budget,
+        "llm_calls_today": stats.get("llm_calls_today", 0),
+        "llm_daily_budget": cfg.verifier.llm_daily_budget,
         "model": model,
         "sources": sources,
         "by_source": stats.get("by_source", []),
@@ -143,8 +145,12 @@ def render(report: dict[str, Any], color: bool | None = None) -> str:
     out.append(f"  Последнее обучение: {m['last_training_at']} — {m['last_decision']}")
     if m.get("last_notes"):
         out.append(f"    {c(m['last_notes'][:110], DIM)}")
-    out.append(f"  Вызовов модели за час: {report['llm_calls_last_hour']} "
+    out.append(f"  Вызовов модели за час:  {report['llm_calls_last_hour']} "
                f"из {report['llm_budget']}")
+    daily = report.get("llm_daily_budget") or 0
+    today = report.get("llm_calls_today", 0)
+    out.append(f"  Вызовов модели за сутки: {today} "
+               + (f"из {daily}" if daily > 0 else "(без лимита)"))
     out.append("")
 
     out.append(c(BAR, CYAN))

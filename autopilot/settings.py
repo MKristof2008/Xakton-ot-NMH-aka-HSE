@@ -96,6 +96,7 @@ class VerifierConfig:
     enabled: bool = True
     llm_enabled: bool = True           # false = только детерминированные проверки
     llm_hourly_budget: int = 40
+    llm_daily_budget: int = 600   # потолок на сутки: 0 = без ограничения
     min_calls_per_item: int = 3   # extract + evaluate + арбитр
     verify_per_cycle: int = 12
     ml_reliability: float = 0.45
