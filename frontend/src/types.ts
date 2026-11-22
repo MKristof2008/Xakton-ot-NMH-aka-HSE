@@ -240,3 +240,63 @@ export interface PricingResponse {
 export interface ApiErrorBody {
   error: { code: string; message: string };
 }
+
+/** Автопилот: фоновый контур сбора и проверки. */
+export interface AutopilotLabelCounts {
+  fake?: number;
+  real?: number;
+  uncertain?: number;
+}
+
+export interface AutopilotModel {
+  version?: string;
+  promoted_at?: string;
+  created_at?: number;
+  f1?: number;
+  precision_score?: number;
+  recall?: number;
+  n_train?: number;
+}
+
+export interface AutopilotSource {
+  source_id: string;
+  source_name: string;
+  role: string;
+  n: number;
+}
+
+export interface AutopilotStats {
+  available: boolean;
+  items_total: number;
+  by_label: AutopilotLabelCounts;
+  fake: number;
+  real: number;
+  uncertain: number;
+  archived: number;
+  pending: number;
+  by_status?: Record<string, number>;
+  model: AutopilotModel | null;
+  llm: { last_hour: number; today: number };
+  sources: AutopilotSource[];
+}
+
+export interface AutopilotItem {
+  id: number;
+  source_id: string;
+  source_name: string;
+  url: string;
+  title: string;
+  excerpt: string;
+  label: 'fake' | 'real' | 'uncertain';
+  label_confidence: number;
+  label_reason: string;
+  label_source: string;
+  trust_score: number | null;
+  trust_level: string | null;
+  verified_at: number | null;
+}
+
+export interface AutopilotRecentResponse {
+  items: AutopilotItem[];
+  total: number;
+}

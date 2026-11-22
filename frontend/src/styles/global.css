@@ -3258,3 +3258,147 @@ dt {
 .limits--public li::marker {
   color: var(--faint);
 }
+
+/* ==================================================== автопилот
+
+   Фоновый контур: те же бумага и чернила, что у остальных экранов.
+   Плитки — счётчики, панели — модель, расход и источники.
+   ============================================================ */
+
+.ap-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.ap-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.ap-tile__n {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.ap-tile__k {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ap-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.ap-panel {
+  padding: 22px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+
+.ap-panel__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+
+.ap-kv {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: 8px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.ap-kv dt {
+  color: var(--muted);
+}
+
+.ap-kv dd {
+  margin: 0;
+  text-align: right;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.ap-note {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.ap-sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.ap-sources li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.ap-sources__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.ap-sources__role {
+  font-size: 12px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.ap-sources__n {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
+  text-align: right;
+}
+
+.ap-recent {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ap-reason {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+  border-left: 2px solid var(--line-strong);
+  padding-left: 12px;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .ap-kv dd {
+    text-align: left;
+  }
+}

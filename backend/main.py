@@ -53,6 +53,7 @@ from lakmus.llm_pipeline import explain_media  # noqa: E402
 from lakmus.tariffs import for_plan  # noqa: E402
 
 import store  # noqa: E402
+import autopilot_feed  # noqa: E402
 from passport import passport_html  # noqa: E402
 from quote_page import build_page as build_quote_page  # noqa: E402
 from sources_page import load_topics, page_html as sources_page_html  # noqa: E402
@@ -706,6 +707,26 @@ async def feed(limit: int = 30, hours: int = 168) -> dict[str, Any]:
         "unclear": len(items) - len(verified) - len(refuted),
     }
 
+
+# ---------- автопилот: что собрал и проверил фоновый контур ----------
+
+@app.get("/api/autopilot/stats")
+async def autopilot_stats() -> dict[str, Any]:
+    """Сводка автопилота: собрано, размечено, очередь, модель, расход модели.
+
+    Читается только на чтение из базы автопилота (WAL), поэтому не мешает
+    его записи. Если автопилот ещё не запускался — `available: false`.
+    """
+    return autopilot_feed.summary()
+
+
+@app.get("/api/autopilot/recent")
+async def autopilot_recent(limit: int = 30, label: str | None = None) -> dict[str, Any]:
+    """Последние материалы, которым автопилот поставил метку.
+
+    `label` — fake | real | uncertain; без него отдаются все размеченные.
+    """
+    return autopilot_feed.recent(limit=limit, label=label)
 
 # ---------- обратная связь: основа дообучения ----------
 
