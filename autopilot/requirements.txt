@@ -1,0 +1,17 @@
+# Автопилот BAYKAM: сбор, проверка, дообучение
+# Установка:  python -m pip install -r autopilot/requirements.txt
+httpx>=0.27
+beautifulsoup4>=4.12
+feedparser>=6.0
+playwright>=1.40
+scikit-learn>=1.3
+joblib>=1.3
+numpy>=1.24
+datasets>=2.16
+
+# опционально: дообучение трансформера на GPU (на CPU не нужно)
+# torch>=2.2
+# transformers>=4.40
+
+# опционально: страницы, которые рендерятся JavaScript'ом
+# после установки:  python -m playwright install chromium
