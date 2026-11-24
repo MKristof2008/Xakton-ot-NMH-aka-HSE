@@ -86,6 +86,12 @@ RULE_TEXT = {
 }
 
 
+#: Порог, с которого правило выносит вердикт само (совпадает с
+#: ``full_pipeline``: столько даёт абсурдная мера или два независимых
+#: маркера, но не один стилистический признак).
+RULE_DECISION = 55
+
+
 def _count_claim_status(claims: Sequence[Any]) -> tuple[int, int, int, int]:
     supported = sum(1 for c in claims if getattr(c, "status", "") == "supported")
     contradicted = sum(
@@ -111,11 +117,24 @@ def judge(
     kb_hit: bool = False,
     bank_hit: bool = False,
     strict_allowed: bool = True,
+    rule_result: Any = None,
+    strict_fake: bool = False,
 ) -> VerdictReasoning:
     """Собрать вердикт по рубрике. Без модели, только из посчитанного.
 
     Возвращает баллы с обоснованием. Никаких «50 по умолчанию»: если
     доказательств нет, балл низкий и это прямо написано.
+
+    ``rule_result`` — итог явных правил (``verdict_rules``). Рубрика видит
+    только статусы утверждений и не знает о признаках жанра вирусной
+    выдумки. Без этой связи в одном ответе стояли бы «скорее фейк» и
+    «это не значит, что новость ложная» — то есть два противоположных
+    вывода. Правило с весомым основанием перебивает рубрику, а правило
+    «непонятно» снимает обвинение, которого рубрика не видит.
+
+    ``strict_fake`` — вердикт «фейк» поставлен строгим режимом: поиск был,
+    но подтверждений не нашлось. Рубрика в этом случае не спорит и не
+    пишет «признаков недостаточно»: она называет настоящую причину.
     """
     tag_key = getattr(tag, "key", "unknown") if tag is not None else "unknown"
     tag_title = (
@@ -264,17 +283,48 @@ def judge(
         # Ни подтверждений, ни опровержений: «фейк» без основания нельзя.
         verdict = "непонятно"
 
+    # Правила видят то, чего рубрика не видит: жанр вирусной выдумки,
+    # стиль текста, запрет «фейка» для прогноза. Итог обязан совпадать
+    # с вердиктом, который увидит человек: иначе в одном ответе стоят
+    # «скорее фейк» и «это не значит, что новость ложная».
+    rule_verdict = str(getattr(rule_result, "verdict", "") or "") if rule_result else ""
+    rule_confidence = int(getattr(rule_result, "confidence", 0) or 0) if rule_result else 0
+    rule_summary = str(getattr(rule_result, "summary", "") or "") if rule_result else ""
+    if rule_verdict in ("фейк", "правда") and rule_confidence >= RULE_DECISION:
+        verdict = rule_verdict
+        confidence = max(confidence, rule_confidence)
+    elif rule_verdict == "непонятно" and verdict == "фейк" and not strict_fake:
+        # Правило сняло обвинение: прогноз, безымянное утверждение,
+        # одиночный стилистический признак.
+        verdict = "непонятно"
+
+    # Строгий режим: поиск был, подтверждений нет — вердикт «фейк» принят
+    # уровнем доверия, а рубрика сама по себе дала бы «непонятно». Итог
+    # и объяснение обязаны совпадать с тем, что показано человеку.
+    if strict_fake:
+        verdict = "фейк"
+
     out.verdict = verdict
     out.confidence = max(0, min(100, confidence))
 
-    if verdict == "фейк":
+    if strict_fake:
+        # Строгий режим: поиск был, подтверждений нет. Это и есть причина,
+        # и она не должна читаться как «признаков недостаточно».
+        out.summary = (
+            "Фейк: источники по теме найдены, но ни один не подтверждает "
+            "сообщение. Строгий режим трактует это как выдумку."
+        )
+    elif rule_summary and rule_verdict == verdict:
+        # Объяснение правила точнее рубрики: оно называет причину словами.
+        out.summary = rule_summary
+    elif verdict == "фейк":
         out.summary = (
             f"Фейк: {contradicted} утверждений опровергнуты, "
             f"подтверждений нет. Уверенность {out.confidence}%."
         )
     elif verdict == "правда":
         out.summary = (
-            f"Правда: {supported} утверждений подтверждены дословно. "
+            f"Правда: подтверждено утверждений — {supported}. "
             f"Уверенность {out.confidence}%."
         )
     elif supported and contradicted:
@@ -282,6 +332,10 @@ def judge(
             "Непонятно: источники противоречат друг другу — "
             f"подтверждено {supported}, опровергнуто {contradicted}."
         )
+    elif rule_verdict == "непонятно" and rule_summary:
+        # Правило объяснило причину лучше рубрики: например, «признаки
+        # жанра вирусной выдумки есть, но одного стиля мало для приговора».
+        out.summary = rule_summary
     elif not sources:
         out.summary = (
             "Непонятно: в доступных источниках ничего не нашлось. "

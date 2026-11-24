@@ -1,8 +1,10 @@
 import { chromium } from '@playwright/test';
 import fs from 'node:fs';
+import os from 'node:os';
 
 const API = 'http://127.0.0.1:8000';
-const SHOTS = 'C:/Users/mvinn/AppData/Local/Temp';
+// Временная папка системы: скрипт не должен зависеть от имени пользователя.
+const SHOTS = os.tmpdir();
 
 // 1. Аккаунт создаём через API — так демо не зависит от формы входа.
 const email = `demo${Date.now()}@example.com`;

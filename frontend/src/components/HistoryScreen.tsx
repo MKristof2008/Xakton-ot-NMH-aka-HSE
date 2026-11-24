@@ -73,7 +73,14 @@ export function HistoryScreen() {
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                <p className="top-item__text">{item.text}</p>
+                {item.title ? (
+                  <>
+                    <p className="top-item__text">{item.title}</p>
+                    <p className="history-item__note">Проверена статья по ссылке</p>
+                  </>
+                ) : (
+                  <p className="top-item__text">{item.text}</p>
+                )}
                 <div className="top-item__meta">
                   <span className={`tag tag--${toneForLevel(item.level)}`}>
                     {item.level_label}

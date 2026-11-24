@@ -362,6 +362,30 @@ def check_against_topic(topic: dict[str, Any], text: str) -> tuple[Verdict, floa
         year_ok = not claim_years or not fact_years or bool(claim_years & fact_years)
 
         if agree is False:
+            # Лишнее число в тексте — не всегда расхождение. «Повысил на
+            # 200 б.п., до 21,00%» — это тот же факт с пояснением, а не
+            # другая ставка. Если главное число записи в тексте есть,
+            # подтверждаем, но честно помечаем, что остальные числа не
+            # сверялись. Опровергаем только когда главного числа нет:
+            # тогда сообщение называет другое значение.
+            main = _content_numbers(str(fact.get("value", "")))
+            main_agrees = bool(main) and bool(claim_numbers & main)
+            if main_agrees:
+                return (
+                    Verdict.supports_real,
+                    RELIABILITY_MATCH,
+                    f"Главное число совпадает с базой: {fact['claim']}.",
+                    {
+                        "topic": topic["topic"],
+                        "matched_fact": fact,
+                        "reason": "extra_numbers",
+                        "claim_numbers": sorted(claim_numbers),
+                        "fact_numbers": sorted(fact_numbers),
+                        "source": fact.get("source"),
+                        "url": fact.get("url"),
+                        "limitation": "Лишние числа в сообщении не сверялись.",
+                    },
+                )
             return (
                 Verdict.supports_fake,
                 RELIABILITY_REFUTE,

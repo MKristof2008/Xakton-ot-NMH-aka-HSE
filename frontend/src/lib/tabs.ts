@@ -1,6 +1,6 @@
-export type Tab = 'check' | 'top' | 'plans' | 'history' | 'feed' | 'access';
+export type Tab = 'check' | 'top' | 'plans' | 'history' | 'feed' | 'autopilot' | 'access';
 
-const TABS: Tab[] = ['check', 'top', 'plans', 'history', 'feed', 'access'];
+const TABS: Tab[] = ['check', 'top', 'plans', 'history', 'feed', 'autopilot', 'access'];
 
 export function readTab(): Tab {
   const hash = window.location.hash.replace('#', '');

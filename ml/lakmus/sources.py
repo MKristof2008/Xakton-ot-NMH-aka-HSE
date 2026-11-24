@@ -23,7 +23,10 @@ import re
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from typing import Any, Optional, Protocol, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Protocol, Sequence
+
+if TYPE_CHECKING:  # только для аннотаций, без импорта на старте
+    from .article import Article
 
 #: Домены, которым доверяем как первоисточникам. Порядок важен: сверху те,
 #: чьё слово весомее.
@@ -230,12 +233,32 @@ class _GuardedRedirects(urllib.request.HTTPRedirectHandler):
 _OPENER = urllib.request.build_opener(_GuardedRedirects)
 
 
+def fetch_article(url: str, timeout: int = FETCH_TIMEOUT) -> Optional["Article"]:
+    """Скачать страницу и извлечь из неё статью целиком.
+
+    Возвращает заголовок, чистый текст и признаки сатиры — без меню,
+    подвала и боковой ленты. None, если страницу не удалось получить.
+    """
+    page = _download(url, timeout=timeout)
+    if page is None:
+        return None
+    from .article import extract_article
+
+    return extract_article(page, url, limit=MAX_CONTENT_CHARS)
+
+
 def fetch_page(url: str, timeout: int = FETCH_TIMEOUT) -> Optional[str]:
-    """Скачать страницу и вернуть текст. None — если не получилось.
+    """Скачать страницу и вернуть чистый текст статьи. None — если не вышло.
 
     Никогда не бросает: недоступный источник — штатная ситуация, пайплайн
     должен продолжить без него.
     """
+    article = fetch_article(url, timeout=timeout)
+    return article.text if article is not None and article.ok else None
+
+
+def _download(url: str, timeout: int = FETCH_TIMEOUT) -> Optional[str]:
+    """Скачать HTML страницы. None, если не получилось."""
     if not url.startswith(("http://", "https://")) or _is_private_host(url):
         return None
     request = urllib.request.Request(
@@ -249,21 +272,9 @@ def fetch_page(url: str, timeout: int = FETCH_TIMEOUT) -> Optional[str]:
     except (urllib.error.URLError, TimeoutError, OSError, ValueError):
         return None
     try:
-        page = raw.decode(charset, errors="replace")
+        return raw.decode(charset, errors="replace")
     except LookupError:
-        page = raw.decode("utf-8", errors="replace")
-    text = _strip_html(page)
-    if len(text) > 50:
-        return text[:MAX_CONTENT_CHARS]
-
-    # Мессенджеры и соцсети отдают пустой каркас: весь смысл в OpenGraph.
-    # Без этого ссылка из Телеграма выглядела как «источник недоступен».
-    if any(h in domain_of(url) for h in _MESSENGER_HOSTS):
-        preview = _og_preview(page)
-        if preview:
-            return preview[:MAX_CONTENT_CHARS]
-    preview = _og_preview(page)
-    return preview[:MAX_CONTENT_CHARS] if preview else None
+        return raw.decode("utf-8", errors="replace")
 
 
 # -------------------------------------------------------------- провайдеры

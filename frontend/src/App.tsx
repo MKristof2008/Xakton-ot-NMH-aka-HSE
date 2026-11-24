@@ -8,6 +8,7 @@ import { AuthDialog } from './components/AuthDialog';
 import { Footer } from './components/Footer';
 import { CheckScreen } from './components/CheckScreen';
 import { FeedScreen } from './components/FeedScreen';
+import { AutopilotScreen } from './components/AutopilotScreen';
 import { HistoryScreen } from './components/HistoryScreen';
 import { TopScreen } from './components/TopScreen';
 import { PlansScreen } from './components/PlansScreen';
@@ -83,6 +84,7 @@ export default function App() {
       <main className="main" id="content">
         {tab === 'check' && <CheckScreen me={me} onMe={setMe} onNeedAuth={requestAuth} />}
         {tab === 'feed' && <FeedScreen />}
+        {tab === 'autopilot' && <AutopilotScreen />}
         {tab === 'history' && <HistoryScreen />}
         {tab === 'top' && <TopScreen />}
         {tab === 'plans' && <PlansScreen me={me} onMe={setMe} onNeedAuth={requestAuth} />}

@@ -134,10 +134,12 @@ _CONTRAST = re.compile(r"\b(но|однако|зато|хотя|впрочем)\
 #: Признаки будущего: прогноз, обещание, ожидание. Такое нельзя назвать
 #: ложью — событие ещё не наступило.
 _FUTURE = re.compile(
-    "(завтра|послезавтра|ожидается|ожидают|прогноз|объявят|"
+    "(завтра|послезавтра|ожидается|ожидают|объявят|"
     "планируют|планируется|собираются|в следующем году|со следующей недели|"
-    "скоро|в ближайшее время|подорожает|подешевеет|вырастет|вырастут|"
-    "упадёт|упадут|снизится|повысится|введут|отменят|повысят|снизят)",
+    "скоро|в ближайшее время|подорожает|подешевеет|"
+    "упадёт|упадут|снизится|введут|отменят|повысят|снизят|"
+    # «повысится», но не «повысил»: прошедшее время — уже случившийся факт.
+    "вырастет|вырастут|повысится|прогнозируется|по прогнозу)",
     re.I,
 )
 
@@ -744,6 +746,18 @@ async def run_check(
         # утверждение нельзя подтверждать одной записью.
         kb_direct = _apply_text_guards(text, kb_direct)
         if kb_direct.status in ("supported", "contradicted"):
+            # Правила вывода нужны и на быстром пути: без них вердикт
+            # («фейк» из строгого режима) и объяснение («непонятно» по
+            # рубрике) расходятся, и человек видит два разных вывода.
+            kb_rules = verdict_rules.rules_for_text(
+                claims=[kb_direct],
+                sources=1,
+                trusted=1 if kb_direct.trusted else 0,
+                kb_hit=kb_direct.trusted,
+                is_future=_is_future(text),
+                is_vague=_is_vague(text),
+                text=text,
+            )
             level, verdict, score, uncertainty = _level_for(
                 [kb_direct],
                 searched=True,
@@ -752,6 +766,7 @@ async def run_check(
                 tag=tag_match.tag,
                 tag_confident=tag_match.is_confident,
                 kb_hit=True,
+                rule_result=kb_rules,
             )
             reasoning = judge(
                 claims=[kb_direct],
@@ -760,6 +775,10 @@ async def run_check(
                 tag=tag_match.tag,
                 tag_confident=tag_match.is_confident,
                 kb_hit=True,
+                rule_result=kb_rules,
+                # «Фейк» без опровержения — строгий режим, и объяснение
+                # обязано называть эту причину, а не «признаков мало».
+                strict_fake=verdict == "фейк" and kb_direct.status != "contradicted",
             )
             outcome = CheckOutcome(
                 claims=[kb_direct],
@@ -1005,7 +1024,22 @@ async def run_check(
 
     # Строгий режим не применяется к прогнозам и безымянным утверждениям:
     # «завтра ожидается снег» — не фейк, даже если подтверждения нет.
-    strict_allowed = not _is_future(text) and not _is_vague(text)
+    #
+    # Прогноз определяется по проверяемым утверждениям, а не по всему
+    # тексту: в статье на тысячу слов почти всегда найдётся «планируется»
+    # или «вырастет», и тогда прошлый факт («ставку повысили») объявлялся
+    # бы прогнозом, а «фейк» тихо снимался бы. Для короткого сообщения
+    # утверждения и есть текст, поэтому поведение не меняется.
+    claims_text = " ".join(c.text for c in findings) if findings else text
+    is_future = _is_future(claims_text)
+    strict_allowed = not is_future and not _is_vague(claims_text)
+
+    # И к присланной ссылке. Материал не улика против себя: свежая новость
+    # может ещё не быть перепечатана, а отсутствие подтверждений — это
+    # «не проверили», а не «выдумали». Сатира и домены из чёрного списка
+    # обрабатываются выше отдельно и по-прежнему дают «фейк».
+    if url:
+        strict_allowed = False
 
     # Явные правила вывода: признаки жанра вирусной выдумки, опора на
     # цитаты, готовое знание. Работают поверх находок и не зависят от
@@ -1019,8 +1053,8 @@ async def run_check(
         # до 70» опровергается действующим законом.
         kb_hit=any(f.source_url and is_trusted(f.source_url) for f in findings),
         bank_hit=False,
-        is_future=_is_future(text),
-        is_vague=_is_vague(text),
+        is_future=is_future,
+        is_vague=_is_vague(claims_text),
         text=text,
     )
 
@@ -1060,9 +1094,17 @@ async def run_check(
             f"Среди найденного есть недостоверные сайты ({hosts}) — "
             "они исключены из доказательств."
         )
+    # Причина «фейка» без источников — это признак жанра, а не поиск:
+    # формулировка должна совпадать с вердиктом, иначе человек читает
+    # «скорее фейк» и тут же «это ограничение поиска, а не вывод».
     if not evidence_sources and sources:
         limitations.append(
             "Все найденные источники недостоверны: подтверждать нечем."
+        )
+    elif not sources and verdict == "фейк":
+        limitations.append(
+            "Источников по теме не нашлось. Вердикт поставлен по признакам "
+            "жанра вирусной выдумки, а не по опровержению источника."
         )
     elif not sources:
         limitations.append(
@@ -1083,6 +1125,18 @@ async def run_check(
         kb_hit=False,
         bank_hit=False,
         strict_allowed=strict_allowed,
+        # Рубрика должна знать итог правил: иначе в одном ответе «скорее
+        # фейк» и «источников нет, это не вывод о ложности» — два разных
+        # вывода. Правило с весомым основанием перебивает рубрику.
+        rule_result=rule_result,
+        # «Фейк» без единого опровержения и не по правилу — это строгий
+        # режим. Если вердикт дало правило (признаки жанра), объяснение
+        # берётся из правила: там причина точнее.
+        strict_fake=(
+            verdict == "фейк"
+            and getattr(rule_result, "verdict", "") != "фейк"
+            and not any(f.status == "contradicted" for f in findings)
+        ),
     )
 
     outcome = CheckOutcome(

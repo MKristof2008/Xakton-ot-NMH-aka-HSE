@@ -1,6 +1,6 @@
 """Хранилище проверок, топов и подписок. SQLite на stdlib.
 
-Три сущности по замыслу эксперта NMH:
+Три сущности:
   checks   — каждая проверка, включая анонимные;
   top      — агрегат по тексту: сколько раз проверяли, какой вердикт;
   users    — тариф (free / pro) и ключ доступа.
@@ -28,6 +28,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS checks (
     id          TEXT PRIMARY KEY,
     text        TEXT NOT NULL,
+    title       TEXT,
     text_hash   TEXT NOT NULL,
     verdict     TEXT NOT NULL,
     score       INTEGER NOT NULL,
@@ -118,6 +119,9 @@ _MIGRATIONS: dict[str, dict[str, str]] = {
     },
     "checks": {
         "user_id": "TEXT",
+        # Заголовок статьи, если проверяли ссылку: в истории он читается
+        # лучше простыни текста и не тащит меню и подвал страницы.
+        "title": "TEXT",
     },
 }
 
@@ -161,6 +165,9 @@ _MIGRATIONS: dict[str, dict[str, str]] = {
     },
     "checks": {
         "user_id": "TEXT",
+        # Заголовок статьи, если проверяли ссылку: в истории он читается
+        # лучше простыни текста и не тащит меню и подвал страницы.
+        "title": "TEXT",
     },
     "payments": {
         "confirmed_at": "TEXT",
@@ -483,17 +490,20 @@ def save_check(
     full: dict[str, Any],
     user_id: Optional[str] = None,
     check_id: Optional[str] = None,
+    title: Optional[str] = None,
 ) -> str:
     """Сохранить проверку. check_id можно передать — тогда ответ API и база
     указывают на одну и ту же запись (иначе фидбек по id не находился)."""
     check_id = check_id or f"chk_{secrets.token_hex(5)}"
     with connect() as conn:
         conn.execute(
-            "INSERT INTO checks(id, text, text_hash, verdict, score, uncertainty, level,"
-            " full_json, user_id, created_at) VALUES(?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO checks(id, text, title, text_hash, verdict, score,"
+            " uncertainty, level, full_json, user_id, created_at)"
+            " VALUES(?,?,?,?,?,?,?,?,?,?,?)",
             (
                 check_id,
                 text,
+                title,
                 text_hash(text),
                 verdict,
                 int(score),
@@ -525,7 +535,8 @@ def user_checks(user_id: str, limit: int = 50) -> list[dict[str, Any]]:
     """
     with connect() as conn:
         rows = conn.execute(
-            "SELECT id, text, verdict, score, uncertainty, level, text_hash, created_at"
+            "SELECT id, text, title, verdict, score, uncertainty, level,"
+            " text_hash, created_at"
             " FROM checks WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
             (user_id, int(limit)),
         ).fetchall()

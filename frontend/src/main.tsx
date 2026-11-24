@@ -2,9 +2,9 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './styles/global.css';
-// Тема «Инженерная редакция»: стиль МГТУ + медиахолдинга.
+// Тема «Инженерная редакция»: инженерный синий, миллиметровка, крупная типографика.
 // Идёт после базовых стилей и перекрывает токены и формы.
-import './styles/theme-bauman.css';
+import './styles/theme.css';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Не найден корневой элемент #root');

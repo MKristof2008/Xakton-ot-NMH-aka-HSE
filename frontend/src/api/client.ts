@@ -1,6 +1,8 @@
 import { apiBaseUrl } from '../config';
 import type {
   ApiKey,
+  AutopilotRecentResponse,
+  AutopilotStats,
   ApiKeyUsage,
   CheckResponse,
   FeedResponse,
@@ -164,6 +166,19 @@ export async function runCheck(
 
 export async function getFeed(hours = 168): Promise<FeedResponse> {
   return request<FeedResponse>(`/feed?hours=${hours}`);
+}
+
+export async function getAutopilotStats(): Promise<AutopilotStats> {
+  return request<AutopilotStats>('/autopilot/stats');
+}
+
+export async function getAutopilotRecent(
+  limit = 30,
+  label?: 'fake' | 'real' | 'uncertain',
+): Promise<AutopilotRecentResponse> {
+  const query = new URLSearchParams({ limit: String(limit) });
+  if (label) query.set('label', label);
+  return request<AutopilotRecentResponse>(`/autopilot/recent?${query.toString()}`);
 }
 
 export async function sendFeedback(payload: {
