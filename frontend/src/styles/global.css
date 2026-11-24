@@ -3402,3 +3402,8 @@ dt {
     text-align: left;
   }
 }
+
+.history-item__note {
+  font-size: 13px;
+  color: var(--faint);
+}

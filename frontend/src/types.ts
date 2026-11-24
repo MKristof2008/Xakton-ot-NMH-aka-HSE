@@ -64,6 +64,16 @@ export interface CheckResponse {
   tag?: TagInfo;
   /** Рубрика: из чего сложился балл доверия. */
   reasoning?: Reasoning;
+  /** Заголовок статьи, если проверяли ссылку. */
+  title?: string;
+  /** Как извлекли статью и не пародия ли это. */
+  article?: {
+    extractor: string;
+    is_satire: boolean;
+    satire_markers: string[];
+    published_at: string | null;
+    domain: string;
+  };
 }
 
 export interface TagInfo {
@@ -127,6 +137,8 @@ export interface TopItem {
 export interface HistoryItem {
   id: string;
   text: string;
+  /** Заголовок статьи, если проверяли ссылку. */
+  title?: string | null;
   verdict: Verdict;
   level: Level;
   level_label: string;

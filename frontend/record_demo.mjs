@@ -1,13 +1,18 @@
 import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Демо для презентации: четыре входа подряд — текст, ссылка, фото, видео.
 // Записывается видео экрана и кадр после каждого вердикта.
 const API = 'http://127.0.0.1:8000';
-const OUT = 'C:/Users/mvinn/Desktop/Xakton HSE/repo/docs/demo';
-const TMP = 'C:/Users/mvinn/AppData/Local/Temp';
+// Кадры кладём в docs/demo рядом с репозиторием, а не в абсолютный путь
+// конкретной машины: скрипт должен работать после клонирования где угодно.
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const OUT = path.join(HERE, '..', 'docs', 'demo');
+const TMP = path.join(HERE, '..', '.demo-tmp');
 fs.mkdirSync(OUT, { recursive: true });
+fs.mkdirSync(TMP, { recursive: true });
 
 const email = `demo${Date.now()}@example.com`;
 const reg = await fetch(`${API}/api/auth/register`, {

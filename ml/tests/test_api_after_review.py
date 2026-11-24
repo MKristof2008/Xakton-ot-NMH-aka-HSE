@@ -32,15 +32,19 @@ def auth(client):
 def test_url_only_check_accepts_link(client, auth, monkeypatch):
     """Ссылка вместо текста — штатный сценарий «поделиться» из мессенджера.
 
-    Сеть в тестах не нужна: подменяем скачивание страницы.
+    Сеть в тестах не нужна: подменяем извлечение статьи со страницы.
     """
     import lakmus.sources as sources_mod
+    from lakmus.article import Article
 
     monkeypatch.setattr(
         sources_mod,
-        "fetch_page",
-        lambda url, timeout=12: (
-            "МРОТ с 1 января 2025 года составляет 22 440 рубля в месяц."
+        "fetch_article",
+        lambda url, timeout=12: Article(
+            title="МРОТ вырос с января",
+            text="МРОТ с 1 января 2025 года составляет 22 440 рубля в месяц.",
+            domain="example.com",
+            extractor="fallback",
         ),
     )
     res = client.post(

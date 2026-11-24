@@ -1,10 +1,10 @@
 """Живой прогон пайплайна «Лакмус» с реальным LLM-клиентом.
 
 Примеры:
-    cd /c/Users/beliy/Xakton-ot-HSE
-    .venv/Scripts/python.exe -m ml.lakmus.live --text "Сегодня в Москве идёт снег."
-    .venv/Scripts/python.exe -m ml.lakmus.live --image photo.png
-    .venv/Scripts/python.exe -m ml.lakmus.live --url "https://example.com/news"
+    cd <корень репозитория>
+    py -3 -m ml.lakmus.live --text "Сегодня в Москве идёт снег."
+    py -3 -m ml.lakmus.live --image photo.png
+    py -3 -m ml.lakmus.live --url "https://example.com/news"
 
 Переменные окружения: LLM_API_KEY, LLM_BASE_URL, LLM_MODEL, LLM_TIMEOUT.
 """

@@ -1,0 +1,7 @@
+{
+  "dataset": "GonzaloA/fake_news (EN) + ru_fake_examples.json (RU)",
+  "n_train": 15822,
+  "n_test": 1758,
+  "accuracy": 0.9852,
+  "model": "TF-IDF(word 1-2, char_wb 3-5) + LogReg (калибр.)"
+}

@@ -1,4 +1,4 @@
-"""HTTP API «Ревизор» — фактчекинг по замыслу эксперта NMH.
+"""HTTP API «Ревизор» — фактчекинг: бесплатно вердикт, по подписке разбор.
 
 Две ступени по подписке:
   free — вердикт и уровень доверия;
@@ -513,17 +513,31 @@ async def check_text(
     if url and not url.startswith(("http://", "https://")):
         return fail("BAD_INPUT", "ссылка должна начинаться с http:// или https://", 422)
 
+    # Заголовок и метаданные статьи — то, что показываем в истории вместо
+    # простыни текста и чем объясняем сатиру.
+    article_title = ""
+    article_meta: dict[str, Any] = {}
+
     if not image and not video:
         # Ссылка вместо текста — штатный сценарий: пользователь жмёт
         # «поделиться» в мессенджере и присылает адрес.
         if url and not text:
-            # Импорт внутри функции: тесты подменяют lakmus.sources.fetch_page,
+            # Импорт внутри функции: тесты подменяют lakmus.sources,
             # и при импорте на уровне модуля подмена не срабатывала.
-            from lakmus.sources import fetch_page as _fetch
+            from lakmus.sources import fetch_article as _fetch_article
 
             # В потоке: синхронное скачивание иначе держит event loop до 12 с.
-            page = await asyncio.to_thread(_fetch, url) or ""
-            text = page.strip()[:MAX_TEXT]
+            article = await asyncio.to_thread(_fetch_article, url)
+            if article is not None and article.ok:
+                text = article.text.strip()[:MAX_TEXT]
+                article_title = article.title
+                article_meta = {
+                    "extractor": article.extractor,
+                    "is_satire": article.is_satire,
+                    "satire_markers": article.satirical_markers,
+                    "published_at": article.published_at,
+                    "domain": article.domain,
+                }
         if len(text) < 8:
             return fail(
                 "BAD_INPUT", "слишком короткий текст: нужно хотя бы 8 символов", 422
@@ -612,12 +626,18 @@ async def check_text(
                 text, url=_clean_url(url), tier=for_plan(plan)
             )
             payload = outcome_payload(outcome, check_id, plan)
-            subject = text or (url or "")
+            if article_title:
+                payload["title"] = article_title
+            if article_meta:
+                payload["article"] = article_meta
+            # В историю идёт заголовок, а не вся статья: список должен читаться.
+            subject = article_title or text or (url or "")
             # В базу всегда кладём полный разбор, независимо от тарифа: он нужен
             # публичному паспорту и повторному открытию по подписке. Тариф
             # ограничивает только ответ API, а не хранение.
             store.save_check(
                 text=subject,
+                title=article_title or None,
                 verdict=payload["verdict"],
                 score=outcome.score,
                 uncertainty=outcome.uncertainty,

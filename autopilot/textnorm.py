@@ -201,47 +201,23 @@ def domain_trusted(url: str, trusted_domains: Iterable[str]) -> bool:
 def extract_article(html_text: str) -> str:
     """Достаёт основной текст статьи из HTML.
 
-    Стратегия: убираем служебные блоки, собираем абзацы <p>, выбираем
-    самый длинный связный контейнер; если абзацев нет — og:description
-    и мета-описание. Возвращает пустую строку, если текст не найден.
+    Делегирует общему извлекателю `lakmus.article`: один код на backend,
+    ML-пайплайн и автопилот. Раньше здесь был свой разбор, и в текст
+    попадали меню, подвал и чужая лента новостей из боковой колонки.
     """
-    if not html_text:
-        return ""
     try:
-        from bs4 import BeautifulSoup
-    except ImportError:  # bs4 не установлен — грубая очистка
+        from lakmus.article import extract_article as _extract
+
+        return _extract(html_text).text
+    except Exception:  # lakmus недоступен — грубая очистка, но не падение
         return strip_tags(html_text)
 
-    soup = BeautifulSoup(html_text, "html.parser")
-    for tag in soup(["script", "style", "noscript", "template", "svg", "iframe",
-                     "form", "nav", "footer", "header", "aside"]):
-        tag.decompose()
 
-    best = ""
-    for selector in ("article", "div[itemprop=articleBody]", "div.article__body",
-                     "div.article__text", "div[class*=article-body]",
-                     "div[class*=article__text]", "main"):
-        node = soup.select_one(selector)
-        if node is None:
-            continue
-        paragraphs = [p.get_text(" ", strip=True) for p in node.find_all("p")]
-        paragraphs = [p for p in paragraphs if len(p) > 30]
-        text = "\n".join(paragraphs)
-        if len(text) > len(best):
-            best = text
+def extract_article_full(html_text: str, url: str = ""):
+    """Статья целиком: заголовок, чистый текст, признаки сатиры."""
+    try:
+        from lakmus.article import extract_article as _extract
 
-    if len(best) < MIN_ARTICLE_CHARS:
-        paragraphs = [p.get_text(" ", strip=True) for p in soup.find_all("p")]
-        paragraphs = [p for p in paragraphs
-                      if len(p) > 40 and not looks_like_boilerplate(p)]
-        candidate = "\n".join(paragraphs)
-        if len(candidate) > len(best):
-            best = candidate
-
-    if len(best) < MIN_ARTICLE_CHARS:
-        meta = soup.find("meta", attrs={"property": "og:description"}) or \
-            soup.find("meta", attrs={"name": "description"})
-        if meta and meta.get("content"):
-            best = normalize_ws(meta["content"])
-
-    return normalize_ws(best)
+        return _extract(html_text, url)
+    except Exception:
+        return None

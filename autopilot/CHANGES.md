@@ -138,7 +138,7 @@ RSS, Telegram, HTML с CSS-селекторами и JSON API — в `autopilot/
 ## 5. Команды
 
 ```powershell
-cd repo-nmh
+cd <корень репозитория>
 
 .\autopilot\RUN_AUTOPILOT.ps1              # цикл 24/7 (ставит зависимости)
 .\autopilot\RUN_AUTOPILOT.ps1 -Once        # один цикл
@@ -217,7 +217,7 @@ autopilot/
 2. **Первый цикл.** `.\autopilot\RUN_AUTOPILOT.ps1 -Once`, затем
    `.\autopilot\STATUS.ps1` — посмотреть, сколько материалов размечено.
 3. **Влить ветку.** `feat/autopilot` запушена, изменения в `main` не
-   вносились. PR: https://github.com/MKristof2008/Xakton-ot-NMH-aka-HSE/pull/new/feat/autopilot
+   вносились.
 
 ---
 

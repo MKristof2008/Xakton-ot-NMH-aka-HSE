@@ -16,20 +16,20 @@ from doreposta import (
     extract_claims,
 )
 
-MESSAGE = "Всем студентам ФКН повысят стипендию с 1 сентября! Срочно репост!"
+MESSAGE = "Всем студентам повысят стипендию с 1 сентября! Срочно репост!"
 
 # Ответы fake-модели: 1-й вызов — извлечение, 2-й — оценка
 FAKE_EXTRACT = json.dumps({"claims": [{
     "id": "c1",
-    "original_span": "Всем студентам ФКН повысят стипендию с 1 сентября",
-    "text": "Всем студентам ФКН повысят стипендию с 1 сентября",
-    "queries": ["повышение стипендии ФКН сентябрь"],
+    "original_span": "Всем студентам повысят стипендию с 1 сентября",
+    "text": "Всем студентам повысят стипендию с 1 сентября",
+    "queries": ["повышение стипендии сентябрь"],
     "missing_context": ["год не указан"]}],
     "uncheckable_reason": None}, ensure_ascii=False)
 
 FAKE_EVALUATE = json.dumps({"claims": [{
     "id": "c1",
-    "text": "Всем студентам ФКН повысят стипендию с 1 сентября",
+    "text": "Всем студентам повысят стипендию с 1 сентября",
     "status": "context",
     "explanation": "Повышение реально, но только для второго курса",
     "evidence": [{"source_id": "s1",
@@ -37,11 +37,11 @@ FAKE_EVALUATE = json.dumps({"claims": [{
                   "relation": "adds_context",
                   "explanation": "Утверждение говорит «всем», источник — только второй курс"}],
     "limitations": ["год повышения не указан в материале"],
-    "next_action": "Проверить приказ на сайте факультета"}]},
+    "next_action": "Проверить приказ на сайте учебного заведения"}]},
     ensure_ascii=False)
 
 SOURCES = [Source(
-    id="s1", title="Новости факультета", url="https://cs.hse.ru/news/123",
+    id="s1", title="Новости учебного заведения", url="https://example.org/news/123",
     content="С сентября стипендию повысят студентам второго курса очной формы.",
     content_kind=ContentKind.page,
 )]

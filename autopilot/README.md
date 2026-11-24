@@ -27,7 +27,7 @@
 ## Запуск (Windows PowerShell)
 
 ```powershell
-cd "C:\Users\mvinn\Desktop\Xakton ot BAUMS\repo"
+cd <корень репозитория>
 
 # первый запуск: поставит зависимости и браузер Playwright, затем пойдёт цикл
 .\autopilot\RUN_AUTOPILOT.ps1
@@ -69,7 +69,7 @@ py -3 -m autopilot models --promote v20261122_013000   # откат/перекл
 py -3 -m autopilot export --out autopilot/data/labeled.csv
 ```
 
-Все команды запускаются из каталога `repo/`.
+Все команды запускаются из корня репозитория.
 
 ## Стартовый набор источников
 

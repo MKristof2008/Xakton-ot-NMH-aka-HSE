@@ -1,8 +1,10 @@
 import { chromium } from '@playwright/test';
+import os from 'node:os';
 
 // Демо рубрики в браузере: открываем проверку на тарифе «Макс» и снимаем экран.
 const API = 'http://127.0.0.1:8000';
-const SHOTS = 'C:/Users/mvinn/AppData/Local/Temp';
+// Временная папка системы: без привязки к имени пользователя.
+const SHOTS = os.tmpdir();
 
 const reg = await fetch(`${API}/api/auth/register`, {
   method: 'POST',

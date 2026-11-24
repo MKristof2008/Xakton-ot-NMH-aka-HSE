@@ -78,10 +78,10 @@ image / text / url с оценкой доверия, «двумя адвокат
 ### Запуск
 
 ```bash
-cd /c/Users/beliy/Xakton-ot-HSE
-.venv/Scripts/python.exe -m pytest ml -q
-.venv/Scripts/python.exe -m ml.tools.eval
-.venv/Scripts/python.exe -m ml.tools.export_schema
+cd <корень репозитория>
+py -3 -m pytest ml -q
+py -3 -m ml.tools.eval
+py -3 -m ml.tools.export_schema
 ```
 
 ### Пример использования

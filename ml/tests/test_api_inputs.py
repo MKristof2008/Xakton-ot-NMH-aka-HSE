@@ -67,12 +67,16 @@ def test_short_text_rejected(auth_headers):
 def test_url_check_accepted(auth_headers, monkeypatch):
     """Ссылка без текста — валидный вход: текст берётся со страницы."""
     import lakmus.sources as sources_mod
+    from lakmus.article import Article
 
     monkeypatch.setattr(
         sources_mod,
-        "fetch_page",
-        lambda url, timeout=12: (
-            "МРОТ с 1 января 2025 года составляет 22 440 рубля в месяц."
+        "fetch_article",
+        lambda url, timeout=12: Article(
+            title="МРОТ вырос с января",
+            text="МРОТ с 1 января 2025 года составляет 22 440 рубля в месяц.",
+            domain="example.invalid",
+            extractor="fallback",
         ),
     )
     r = client.post(
@@ -90,7 +94,7 @@ def test_url_unreachable_asks_for_text(auth_headers, monkeypatch):
     """Страница не скачалась — честно просим текст, а не выдумываем вердикт."""
     import lakmus.sources as sources_mod
 
-    monkeypatch.setattr(sources_mod, "fetch_page", lambda url, timeout=12: "")
+    monkeypatch.setattr(sources_mod, "fetch_article", lambda url, timeout=12: None)
     r = client.post(
         "/api/check",
         json={"url": "https://example.invalid/news/1"},
