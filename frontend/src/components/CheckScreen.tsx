@@ -64,8 +64,36 @@ export function CheckScreen({ me, onMe, onNeedAuth }: Props) {
   const [busy, setBusy] = useState(false);
   const reduced = useReducedMotion();
   const resultRef = useRef<HTMLDivElement>(null);
+  // Индикатор вкладок: отдельный элемент, который едет transform'ом, а не перерисовкой.
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const [indicator, setIndicator] = useState({ x: 0, y: 0, w: 0, h: 0, ready: false });
   // Текст, который ждёт входа: после авторизации проверка запустится сама.
   const pendingText = useRef<string | null>(null);
+
+  // Пересчитываем положение индикатора при смене вкладки, размера окна и загрузке шрифтов.
+  useEffect(() => {
+    const wrap = tabsRef.current;
+    if (!wrap) return;
+    const measure = () => {
+      const active = wrap.querySelector<HTMLElement>('.input-tab.is-active');
+      if (!active) return;
+      setIndicator((prev) => ({
+        x: active.offsetLeft,
+        y: active.offsetTop,
+        w: active.offsetWidth,
+        h: active.offsetHeight,
+        ready: prev.ready,
+      }));
+    };
+    measure();
+    // первый замер без анимации, дальше — плавный переезд
+    const raf = requestAnimationFrame(() => setIndicator((p) => ({ ...p, ready: true })));
+    window.addEventListener('resize', measure);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', measure);
+    };
+  }, [mode]);
 
   const submit = useCallback(
     async (raw?: string) => {
@@ -236,7 +264,20 @@ export function CheckScreen({ me, onMe, onNeedAuth }: Props) {
           />
         </div>
 
-        <div className="input-tabs" role="tablist" aria-label="Что приложить">
+        <div className="input-tabs" role="tablist" aria-label="Что приложить" ref={tabsRef}>
+          {/* Индикатор активной вкладки: едет transform'ом, раскладка не прыгает. */}
+          <span
+            className={`input-tab-ind${indicator.ready ? '' : ' is-jump'}`}
+            aria-hidden="true"
+            style={
+              {
+                '--x': `${indicator.x}px`,
+                '--y': `${indicator.y}px`,
+                '--w': `${indicator.w}px`,
+                '--h': `${indicator.h}px`,
+              } as React.CSSProperties
+            }
+          />
           {FILE_TABS.map((tab) => (
             <button
               key={tab.id}

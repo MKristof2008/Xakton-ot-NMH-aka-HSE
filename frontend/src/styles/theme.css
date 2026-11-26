@@ -1,193 +1,191 @@
 /* ============================================================
-   Тема «Тёплая редакция».
+   Тема «Язык Apple».
 
-   Редакционный стиль: тёплая бумага, чернильный текст, одна сильная
-   краска — киноварь. Крупные антиквенные заголовки, мягкие скругления,
-   тени вместо линеек. Никакой чертёжной сетки.
+   Принципы, на которых построено:
+   • Типографика системная: SF Pro / -apple-system. Иерархия — размером
+     и весом, не цветом. Заголовки крупные, с отрицательным трекингом.
+   • Воздух: широкие поля, узкая колонка контента, много пустого места.
+   • Цвет сдержанный: почти-белый фон, почти-чёрный текст, ОДИН акцент —
+     системный синий. Смысловые цвета приглушены.
+   • Формы: скругления 12–18 px, кнопки-пилюли, тонкие разделители
+     вместо рамок, мягкие тени.
+   • Материалы: полупрозрачная шапка с размытием.
 
-   Ничего не меняет в разметке: только оформление. Название «Ревизор»
-   и знак-галочка остаются своими.
+   Селекторы не менялись — только оформление.
    ============================================================ */
 
 :root {
-  /* бумага: тёплая, газетная */
-  --paper: #fbf8f3;
-  --paper-2: #f3eee5;
+  /* поверхности: почти белый, как в интерфейсах Apple */
+  --paper: #fbfbfd;
+  --paper-2: #f5f5f7;
   --surface: #ffffff;
-  --ink: #1c1917;
-  --muted: #6b625a;
-  --faint: #9a9088;
-  --line: #e6ded2;
-  --line-strong: #d3c8b8;
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --faint: #86868b;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
 
-  /* смысловые тона: приглушённые, как типографские краски */
-  --ok: #1f6b4a;
-  --ok-soft: #e8f3ec;
-  --ok-line: #c2ddcd;
-  --bad: #a8321f;
-  --bad-soft: #fbeae5;
-  --bad-line: #f0cabf;
-  --fog: #5d5348;
-  --fog-soft: #f0eae0;
-  --fog-line: #ddd2c2;
+  /* смысловые тона: системные, приглушённые */
+  --ok: #1d7f4e;
+  --ok-soft: rgba(29, 127, 78, 0.08);
+  --ok-line: rgba(29, 127, 78, 0.2);
+  --bad: #d70015;
+  --bad-soft: rgba(215, 0, 21, 0.07);
+  --bad-line: rgba(215, 0, 21, 0.18);
+  --fog: #6e6e73;
+  --fog-soft: rgba(110, 110, 115, 0.08);
+  --fog-line: rgba(110, 110, 115, 0.18);
 
-  /* фирменная киноварь */
-  --accent: #c2401f;
-  --accent-strong: #9c2f14;
-  --accent-soft: #fceee8;
-  --accent-line: #f0c4b4;
-  --signal: #c2401f;
+  /* единственный акцент — системный синий Apple */
+  --accent: #0071e3;
+  --accent-strong: #0077ed;
+  --accent-soft: rgba(0, 113, 227, 0.08);
+  --accent-line: rgba(0, 113, 227, 0.24);
+  --signal: #0071e3;
 
   /* инверсная плоскость */
-  --inv-bg: #1c1917;
-  --inv-fg: #fbf8f3;
-  --inv-muted: #a89e93;
-  --inv-line: #3a342e;
+  --inv-bg: #1d1d1f;
+  --inv-fg: #f5f5f7;
+  --inv-muted: #a1a1a6;
+  --inv-line: #333336;
 
-  /* типографика: антиква для заголовков, гротеск для текста, моно для цифр */
-  --font-display: 'Georgia', 'Iowan Old Style', 'Times New Roman', serif;
-  --font-text: 'Golos Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial,
-    sans-serif;
-  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas,
-    'Courier New', monospace;
+  /* системный шрифт: Display для крупного, Text для мелкого */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display',
+    'Segoe UI', system-ui, 'Helvetica Neue', Arial, sans-serif;
+  --font-text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
 
-  --radius: 14px;
-  --radius-sm: 8px;
-  --page: 1040px;
-  --shadow-soft: 0 1px 2px rgba(28, 25, 23, 0.04), 0 8px 24px rgba(28, 25, 23, 0.06);
-  --shadow-lift: 0 2px 4px rgba(28, 25, 23, 0.06), 0 16px 40px rgba(28, 25, 23, 0.1);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --page: 980px;
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.05);
+  --shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.05), 0 18px 48px rgba(0, 0, 0, 0.09);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #14110f;
-    --paper-2: #1d1916;
-    --surface: #1a1714;
-    --ink: #f5f0e8;
-    --muted: #a99f94;
-    --faint: #7d736a;
-    --line: #2e2823;
-    --line-strong: #443c35;
+    --paper: #000000;
+    --paper-2: #1d1d1f;
+    --surface: #161617;
+    --ink: #f5f5f7;
+    --muted: #a1a1a6;
+    --faint: #86868b;
+    --line: rgba(255, 255, 255, 0.1);
+    --line-strong: rgba(255, 255, 255, 0.2);
 
-    --ok: #7fd1a6;
-    --ok-soft: #12291e;
-    --ok-line: #24503a;
-    --bad: #ff9d84;
-    --bad-soft: #2e1712;
-    --bad-line: #5a2a1f;
-    --fog: #c0b6aa;
-    --fog-soft: #241f1a;
-    --fog-line: #3a332c;
+    --ok: #30d158;
+    --ok-soft: rgba(48, 209, 88, 0.12);
+    --ok-line: rgba(48, 209, 88, 0.26);
+    --bad: #ff453a;
+    --bad-soft: rgba(255, 69, 58, 0.12);
+    --bad-line: rgba(255, 69, 58, 0.26);
+    --fog: #a1a1a6;
+    --fog-soft: rgba(161, 161, 166, 0.12);
+    --fog-line: rgba(161, 161, 166, 0.24);
 
-    --accent: #ff8a63;
-    --accent-strong: #ffb094;
-    --accent-soft: #2e1a13;
-    --accent-line: #5c2f1f;
-    --signal: #ff8a63;
+    --accent: #0a84ff;
+    --accent-strong: #409cff;
+    --accent-soft: rgba(10, 132, 255, 0.14);
+    --accent-line: rgba(10, 132, 255, 0.3);
+    --signal: #0a84ff;
 
-    --inv-bg: #f5f0e8;
-    --inv-fg: #14110f;
-    --inv-muted: #6b625a;
-    --inv-line: #d3c8b8;
+    --inv-bg: #f5f5f7;
+    --inv-fg: #1d1d1f;
+    --inv-muted: #6e6e73;
+    --inv-line: #d2d2d7;
 
-    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
-    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.35);
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.6), 0 18px 48px rgba(0, 0, 0, 0.5);
 
     color-scheme: dark;
   }
 }
 
-/* -------------------------------------------------- фон: чистая бумага */
+/* -------------------------------------------------- фон: чистая поверхность */
 
 body {
   background-color: var(--paper);
-  /* лёгкое теплое свечение сверху вместо сетки */
-  background-image: radial-gradient(
-    ellipse 1200px 400px at 50% -100px,
-    rgba(194, 64, 31, 0.05),
-    transparent 70%
-  );
-  background-repeat: no-repeat;
+  background-image: none;
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 body::before {
   display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-image: radial-gradient(
-      ellipse 1200px 400px at 50% -100px,
-      rgba(255, 138, 99, 0.06),
-      transparent 70%
-    );
-  }
-}
-
 .main {
   max-width: var(--page);
   margin: 0 auto;
-  padding: 48px 24px 88px;
+  padding: 72px 24px 112px;
 }
 
 /* ------------------------------------------------------------ шапка */
 
+/* полупрозрачная шапка с размытием — материал Apple */
 .header {
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(12px) saturate(140%);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 50;
 }
 
-/* двойная линейка чертежа больше не нужна */
 .header::after {
   display: none;
 }
 
 .header__inner {
   max-width: var(--page);
-  height: 68px;
-  gap: 28px;
+  height: 52px;
+  gap: 32px;
 }
 
 .brand {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   text-transform: none;
+  color: var(--ink);
 }
 
-/* Знак: тёплый круг с мягкой тенью вместо инженерной рамки. */
+/* Знак: акцентный круг, без тени и объёма */
 .brand__mark {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: linear-gradient(145deg, var(--accent), var(--accent-strong));
+  background: var(--accent);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(194, 64, 31, 0.32);
+  box-shadow: none;
+  transition: background 0.2s ease;
 }
 
 .brand__mark svg {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
 }
 
 .brand:hover .brand__mark {
-  transform: translateY(-1px) scale(1.03);
-  background: linear-gradient(145deg, var(--accent-strong), var(--accent));
+  transform: none;
+  background: var(--accent-strong);
 }
 
 .nav__link {
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   text-transform: none;
-  color: var(--muted);
+  color: var(--ink);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 6px 9px;
+  opacity: 0.88;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
 
 .nav__link::after {
@@ -195,38 +193,41 @@ body::before {
 }
 
 .nav__link:hover {
-  color: var(--ink);
+  opacity: 1;
   background: var(--paper-2);
 }
 
 .nav__link[aria-current='page'] {
   color: var(--accent);
-  background: var(--accent-soft);
-  font-weight: 600;
+  background: transparent;
+  font-weight: 500;
+  opacity: 1;
 }
 
 /* ------------------------------------------------------------ первый экран */
 
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
+  font-family: var(--font-text);
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--faint);
   font-weight: 600;
 }
 
 .passport .eyebrow {
-  color: var(--muted);
+  color: var(--faint);
 }
 
+/* Крупный заголовок: вес 600, плотный трекинг, плотный интерлиньяж */
 .hero__title {
   font-family: var(--font-display);
-  font-size: clamp(40px, 6vw, 68px);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.03em;
+  font-size: clamp(44px, 6.4vw, 76px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   color: var(--ink);
+  margin-bottom: 20px;
 }
 
 .hero__title em {
@@ -234,16 +235,17 @@ body::before {
   color: var(--accent);
 }
 
-/* подчёркивание-линейка под акцентом убираем: антиква сама держит акцент */
 .hero__title em::after {
   display: none;
 }
 
 .hero__lead {
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 21px;
+  line-height: 1.42;
+  letter-spacing: -0.012em;
   color: var(--muted);
-  max-width: 62ch;
+  max-width: 56ch;
+  font-weight: 400;
 }
 
 /* ------------------------------------------------------------ панель ввода */
@@ -253,11 +255,10 @@ body::before {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
-  padding: 28px;
+  padding: 32px;
   position: relative;
 }
 
-/* угловые засечки чертежа больше не нужны */
 .panel::before,
 .panel::after {
   display: none;
@@ -266,29 +267,36 @@ body::before {
 .field__label {
   font-family: var(--font-text);
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--faint);
 }
 
 .field__hint {
   font-size: 12px;
   color: var(--faint);
+  letter-spacing: -0.01em;
 }
 
 .input {
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--paper);
+  background: var(--paper-2);
   color: var(--ink);
-  padding: 13px 15px;
-  font-size: 15px;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  padding: 14px 16px;
+  font-size: 17px;
+  font-family: var(--font-text);
+  letter-spacing: -0.01em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--faint);
 }
 
 .input:hover {
-  border-color: var(--muted);
+  border-color: rgba(0, 0, 0, 0.24);
 }
 
 .input:focus {
@@ -299,64 +307,70 @@ body::before {
 }
 
 .counter {
-  font-family: var(--font-mono);
+  font-family: var(--font-text);
   font-size: 12px;
+  letter-spacing: -0.01em;
   color: var(--faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .counter--near {
   color: var(--bad);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* ------------------------------------------------------------ кнопки */
 
+/* кнопка-пилюля: как «Купить» в Apple Store */
 .btn {
-  border-radius: 999px;
-  font-weight: 600;
-  letter-spacing: 0;
-  padding: 12px 22px;
-  transition: transform 0.12s ease, box-shadow 0.16s ease, background 0.16s ease;
+  border-radius: 980px;
+  font-family: var(--font-text);
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  padding: 12px 24px;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn--primary {
   background: var(--accent);
   color: #fff;
   border: none;
-  box-shadow: 0 2px 10px rgba(194, 64, 31, 0.24);
+  box-shadow: none;
 }
 
 .btn--primary:hover:not(:disabled) {
   background: var(--accent-strong);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(194, 64, 31, 0.3);
+  transform: none;
+  box-shadow: none;
 }
 
 .btn--primary:active:not(:disabled) {
-  transform: translateY(0);
+  background: var(--accent-strong);
+  transform: scale(0.985);
 }
 
 .btn--ghost {
-  background: transparent;
-  border: 1px solid var(--line-strong);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
   color: var(--ink);
 }
 
 .btn--ghost:hover:not(:disabled) {
-  background: var(--paper-2);
-  border-color: var(--muted);
+  background: var(--surface);
+  border-color: var(--line-strong);
 }
 
 /* ------------------------------------------------------------ примеры */
 
 .chips {
-  gap: 10px;
+  gap: 8px;
 }
 
 .chips__label {
   font-family: var(--font-text);
   font-size: 12px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--faint);
 }
@@ -364,17 +378,18 @@ body::before {
 .chip {
   background: var(--paper-2);
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 980px;
   padding: 8px 16px;
-  font-size: 13.5px;
+  font-size: 14px;
+  letter-spacing: -0.01em;
   color: var(--muted);
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .chip:hover {
   background: var(--accent-soft);
-  border-color: var(--accent-line);
-  color: var(--accent-strong);
+  border-color: transparent;
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------------ вердикт */
@@ -384,67 +399,66 @@ body::before {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lift);
-  padding: 32px;
+  padding: 40px;
 }
 
-/* цветная полоса слева: тонкая, но заметная */
-.verdict::before {
-  width: 5px;
-  border-radius: var(--radius) 0 0 var(--radius);
-  background: var(--accent);
-}
-
+/* цветную полосу слева убираем: Apple не кричит цветом */
+.verdict::before,
 .verdict::after {
   display: none;
 }
 
 .verdict__word {
   font-family: var(--font-display);
-  font-size: clamp(32px, 4.5vw, 48px);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.06;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
 }
 
 .verdict__sub {
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.012em;
   color: var(--muted);
 }
 
 .score__num {
-  font-family: var(--font-mono);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 600;
   letter-spacing: -0.04em;
-  color: var(--accent);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .score__of {
-  font-family: var(--font-mono);
+  font-family: var(--font-text);
   color: var(--faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .meter + .score__label {
   font-size: 12px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--faint);
 }
 
 .meter {
   background: var(--paper-2);
-  border-radius: 999px;
+  border-radius: 980px;
   overflow: hidden;
-  height: 8px;
+  height: 6px;
 }
 
 .meter__fill {
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  border-radius: 980px;
+  background: var(--accent);
 }
 
 .verdict__meta {
-  font-size: 13px;
+  font-size: 14px;
+  letter-spacing: -0.01em;
   color: var(--muted);
 }
 
@@ -457,44 +471,48 @@ body::before {
 
 .paywall {
   background: var(--paper-2);
-  border: 1px dashed var(--line-strong);
+  border: none;
   border-radius: var(--radius-sm);
-  padding: 20px;
+  padding: 24px;
 }
 
 .paywall h3 {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
 .breakdown__title {
   font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .signal__name {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
+  letter-spacing: -0.01em;
 }
 
 .signal__strength {
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--muted);
+  font-family: var(--font-text);
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .tag {
-  border-radius: 999px;
+  border-radius: 980px;
   background: var(--paper-2);
   color: var(--muted);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  padding: 4px 11px;
 }
 
 /* ------------------------------------------------------------ топы */
@@ -503,37 +521,40 @@ body::before {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  padding: 16px 18px;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
+  padding: 18px 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .top-item:hover {
-  border-color: var(--accent-line);
+  border-color: var(--line-strong);
   box-shadow: var(--shadow-soft);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .top-item__rank {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--accent);
+  font-size: 21px;
+  font-weight: 600;
   letter-spacing: -0.03em;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .top-item__text {
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.45;
+  letter-spacing: -0.012em;
   color: var(--ink);
 }
 
 .top-item__meta {
-  font-size: 12.5px;
+  font-size: 13px;
+  letter-spacing: -0.01em;
   color: var(--faint);
 }
 
 .top-item__anchor:hover .top-item__text {
-  color: var(--accent-strong);
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------------ скелетон */
@@ -546,12 +567,13 @@ body::before {
 
 .skeleton__step {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 15px;
+  letter-spacing: -0.01em;
 }
 
 .skeleton__step.is-active {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .skeleton__step.is-active .skeleton__dot {
@@ -565,20 +587,20 @@ body::before {
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--surface);
-  box-shadow: var(--shadow-soft);
-  padding: 24px;
+  box-shadow: none;
+  padding: 28px;
 }
 
 .plan--recommended {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), var(--shadow-lift);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .plan__price {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: var(--ink);
 }
 
 /* --------------------------------------------------------------- подвал */
@@ -586,8 +608,8 @@ body::before {
 .site-footer {
   border-top: 1px solid var(--line);
   font-family: var(--font-text);
-  font-size: 12.5px;
-  letter-spacing: 0;
+  font-size: 12px;
+  letter-spacing: -0.005em;
   color: var(--faint);
   background: transparent;
 }
@@ -598,35 +620,316 @@ code,
 code.passport__url {
   font-family: var(--font-mono);
   background: var(--paper-2);
-  border-radius: 5px;
+  border-radius: 6px;
   padding: 2px 6px;
-  font-size: 0.92em;
+  font-size: 0.9em;
+  letter-spacing: 0;
 }
 
 ::selection {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
 @media (max-width: 680px) {
   .main {
-    padding: 28px 16px 64px;
+    padding: 40px 20px 72px;
   }
 
   .panel {
-    padding: 20px 18px;
+    padding: 22px 20px;
+    border-radius: var(--radius-sm);
   }
 
   .verdict {
-    padding: 24px 20px 22px 26px;
+    padding: 28px 22px;
+  }
+
+  .hero__title {
+    font-size: clamp(34px, 9vw, 44px);
+    letter-spacing: -0.03em;
+  }
+
+  .hero__lead {
+    font-size: 17px;
   }
 
   .brand {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .header__inner {
-    height: 60px;
-    gap: 16px;
+    height: 48px;
+    gap: 12px;
   }
+
+  .nav__link {
+    font-size: 11px;
+    padding: 5px 7px;
+  }
+}
+
+/* ============================================================
+   Слой движения.
+
+   Правила взяты из tasteskill 2.5 (references/motion.md):
+   • двигаются только transform, scale и opacity — ничего не прыгает в раскладке;
+   • одна кривая для интерфейса: cubic-bezier(.2,.8,.2,1);
+   • вход героя — один раз при загрузке, ~1.1 с;
+   • карточка поднимается на 2px, фото растёт до 1.03 внутри маски;
+   • кнопка шагает на 1px вверх и прижимается на 1px вниз при нажатии;
+   • индикатор вкладок едет transform'ом, а не перерисовкой;
+   • при prefers-reduced-motion остаются только смена цвета и фокус.
+   ============================================================ */
+
+:root {
+  --m-in: 150ms;
+  --m-out: 120ms;
+  --m-press: 90ms;
+  --m-slide: 240ms;
+  --m-panel: 200ms;
+  --m-image: 600ms;
+  --m-image-out: 400ms;
+  --m-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --m-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --m-ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --m-lift: -2px;
+}
+
+/* ---------------------------------------------------------- кнопки */
+
+.btn {
+  position: relative;
+  transition:
+    background-color var(--m-out) var(--m-ease),
+    color var(--m-out) var(--m-ease),
+    border-color var(--m-out) var(--m-ease),
+    box-shadow var(--m-out) var(--m-ease),
+    transform var(--m-press) var(--m-ease);
+}
+
+.btn:hover {
+  transition-duration: var(--m-in), var(--m-in), var(--m-in), var(--m-in), var(--m-press);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/* стрелка в кнопке отъезжает на 3px */
+.btn__arrow,
+.btn svg {
+  transition: transform var(--m-out) var(--m-ease);
+}
+
+.btn:hover .btn__arrow,
+.btn:hover svg,
+.btn:focus-visible .btn__arrow,
+.btn:focus-visible svg {
+  transform: translateX(3px);
+  transition-duration: var(--m-in);
+}
+
+/* ---------------------------------------------------------- карточки и списки */
+
+/* карточка поднимается на 2px, тень глубже — как в motion.md */
+.top-item,
+.plan {
+  transition:
+    transform var(--m-out) var(--m-ease),
+    border-color var(--m-out) var(--m-ease),
+    box-shadow var(--m-out) var(--m-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .top-item:hover,
+  .plan:hover {
+    transform: translateY(var(--m-lift));
+    border-color: color-mix(in oklab, var(--ink) 16%, transparent);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 14px 32px -18px rgba(0, 0, 0, 0.35);
+    transition-duration: 180ms;
+  }
+}
+
+/* ---------------------------------------------------------- ссылки: линия рисуется */
+
+.nav__link {
+  transition:
+    color var(--m-out) var(--m-ease),
+    background-color var(--m-out) var(--m-ease),
+    opacity var(--m-out) var(--m-ease);
+}
+
+.nav__link:hover {
+  transition-duration: var(--m-in), var(--m-in), var(--m-in);
+}
+
+/* ---------------------------------------------------------- вкладки: индикатор едет */
+
+/* сам индикатор — отдельный элемент, его двигает transform, а не смена раскладки */
+.input-tabs {
+  position: relative;
+  isolation: isolate;
+}
+
+.input-tabs .input-tab {
+  position: relative;
+  z-index: 1;
+  transition:
+    color var(--m-slide) var(--m-ease),
+    background-color var(--m-out) var(--m-ease);
+}
+
+.input-tab-ind {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: var(--w, 0px);
+  height: var(--h, 0px);
+  border-radius: 980px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  transform: translate(var(--x, 0px), var(--y, 0px)) scale(var(--sx, 1), var(--sy, 1));
+  transform-origin: 0 0;
+  transition: transform var(--m-slide) var(--m-ease-io);
+}
+
+.input-tab-ind.is-jump {
+  transition: none;
+}
+
+/* ---------------------------------------------------------- поля ввода */
+
+.input,
+textarea.input {
+  transition:
+    border-color var(--m-out) var(--m-ease),
+    box-shadow var(--m-out) var(--m-ease),
+    background-color var(--m-out) var(--m-ease);
+}
+
+.input:focus {
+  transition-duration: 0s;
+}
+
+/* ---------------------------------------------------------- примеры-чипсы */
+
+.chip {
+  transition:
+    background-color var(--m-out) var(--m-ease),
+    color var(--m-out) var(--m-ease),
+    transform var(--m-press) var(--m-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover {
+    transform: translateY(-1px);
+    transition-duration: var(--m-in), var(--m-in), var(--m-press);
+  }
+}
+
+.chip:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ---------------------------------------------------------- вход героя: один раз при загрузке */
+
+/* строки заголовка выезжают из-под маски, затем лид и панель — 1.1 с */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero .eyebrow,
+.hero .hero__title,
+.hero .hero__lead {
+  animation: hero-rise 620ms var(--m-ease-enter) both;
+}
+
+.hero .eyebrow {
+  animation-delay: 40ms;
+}
+
+.hero .hero__title {
+  animation-delay: 110ms;
+}
+
+.hero .hero__lead {
+  animation-delay: 220ms;
+}
+
+.panel {
+  animation: hero-rise 700ms var(--m-ease-enter) 300ms both;
+}
+
+/* ---------------------------------------------------------- вердикт появляется спокойно */
+
+@keyframes verdict-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.verdict,
+.skeleton {
+  animation: verdict-in 420ms var(--m-ease-enter) both;
+}
+
+/* полоса шкалы растёт от нуля — только transform, без пересчёта раскладки */
+.meter__fill {
+  transform-origin: left center;
+  animation: meter-grow 700ms var(--m-ease-enter) 120ms both;
+}
+
+@keyframes meter-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------- уважение к настройкам */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .btn:hover:not(:disabled),
+  .top-item:hover,
+  .plan:hover,
+  .chip:hover {
+    transform: none;
+  }
+}
+
+/* активная вкладка больше не рисует свою подложку — её рисует индикатор */
+.input-tab.is-active {
+  background: transparent;
+  box-shadow: none;
 }
